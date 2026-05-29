@@ -35,13 +35,13 @@ def calculate_tdee(bmr, activity):
 
 def get_level(exp):
     if exp < 50:
-        return 1, "🥚 알 수룡이"
+        return 1, "🥚 알 수룡이", "KakaoTalk_20260529_171613121.jpg"
     elif exp < 120:
-        return 2, "🐣 아기 수룡이"
+        return 2, "🐣 아기 수룡이", "KakaoTalk_20260529_171613121_01.jpg"
     elif exp < 220:
-        return 3, "🐉 청소년 수룡이"
+        return 3, "🐉 청소년 수룡이", "KakaoTalk_20260529_171613121_02.jpg"
     else:
-        return 4, "👑 성체 수룡이"
+        return 4, "👑 성체 수룡이", "KakaoTalk_20260529_171613121_03.jpg"
 
 def load_exp():
     if os.path.exists(GROW_FILE):
@@ -120,17 +120,10 @@ with col1:
     )
 
 with col2:
-    height = st.number_input(
-        "키(cm)",
-        min_value=1.0,
-        value=float(profile.get("키(cm)", 165.0))
-    )
+    height = st.text_input("키(cm)", value="")
 
 with col3:
-    weight = st.number_input(
-        "몸무게(kg)",
-        min_value=1.0
-    )
+    weight = st.text_input("몸무게(kg)", value="")
 
 activity_options = ["거의 안 움직임", "가벼운 활동", "보통", "활발함", "매우 활발"]
 activity = st.selectbox(
@@ -160,13 +153,19 @@ save_profile({
     "이름": name,
     "성별": gender,
     "나이": age,
-    "키(cm)": height,
     "활동량": activity,
     "목표": goal,
     "알레르기 음식": allergy,
     "싫어하는 음식": dislike,
     "선호 식단": food_style
 })
+
+if not height or not weight:
+    st.info("키와 몸무게를 입력하면 맞춤 분석이 시작됩니다.")
+    st.stop()
+
+height = float(height)
+weight = float(weight)
 
 user_bmi = calculate_bmi(weight, height)
 user_bmr = calculate_bmr(weight, height, age, gender)
@@ -389,8 +388,8 @@ with tab2:
         new_exp = old_exp + gained_exp
         save_exp(new_exp)
 
-        old_level, old_level_name = get_level(old_exp)
-        new_level, new_level_name = get_level(new_exp)
+        old_level, old_level_name, old_level_img = get_level(old_exp)
+        new_level, new_level_name, new_level_img = get_level(new_exp)
 
         st.success(f"🎉 운동 기록 저장 완료! 수룡이가 {gained_exp} XP를 얻었어요.")
 
@@ -500,9 +499,14 @@ with tab4:
     st.caption("운동 기록을 저장하면 경험치가 올라가고, 수룡이가 4단계로 진화합니다.")
 
     exp = load_exp()
-    level, level_name = get_level(exp)
+    level, level_name, level_img = get_level(exp)
 
     st.subheader(f"현재 단계: {level_name}")
+
+    try:
+        st.image(level_img, use_container_width=True)
+    except:
+        st.error(f"⚠️ '{level_img}' 파일을 찾을 수 없습니다. GitHub에 이미지 파일을 올렸는지 확인해주세요.")
 
     if exp >= 220:
         st.progress(1.0)
