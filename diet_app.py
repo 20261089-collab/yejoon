@@ -173,9 +173,8 @@ if height and weight:
     user_tdee = calculate_tdee(user_bmr, activity)
 
 else:
-    if not height or not weight:
-    st.info("👤 키와 몸무게를 입력하면 맞춤 분석이 시작됩니다.")
-else:
+    st.warning("키와 몸무게를 입력해주세요.")
+    st.stop()
     ...
 if goal == "감량":
     daily_calorie = user_tdee - 300
