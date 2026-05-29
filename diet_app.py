@@ -111,25 +111,21 @@ gender = st.selectbox(
 
 col1, col2, col3 = st.columns(3)
 
-with col1:
-    age = st.number_input(
-        "나이",
-        min_value=1,
-        step=1,
-        value=int(profile.get("나이", 20))
-    )
-
 with col2:
-    height = st.number_input(
+    height = st.text_input(
         "키(cm)",
-        min_value=1.0,
-        value=float(profile.get("키(cm)", 165.0))
+        value=""
     )
 
 with col3:
-    weight = st.number_input(
+    weight = st.text_input(
         "몸무게(kg)",
-        min_value=1.0
+        value=""
+    )
+with col3:
+    weight = st.text_input(
+        "몸무게(kg)",
+        value=""
     )
 
 activity_options = ["거의 안 움직임", "가벼운 활동", "보통", "활발함", "매우 활발"]
@@ -160,7 +156,6 @@ save_profile({
     "이름": name,
     "성별": gender,
     "나이": age,
-    "키(cm)": height,
     "활동량": activity,
     "목표": goal,
     "알레르기 음식": allergy,
@@ -168,10 +163,20 @@ save_profile({
     "선호 식단": food_style
 })
 
-user_bmi = calculate_bmi(weight, height)
-user_bmr = calculate_bmr(weight, height, age, gender)
-user_tdee = calculate_tdee(user_bmr, activity)
+if height and weight:
 
+    height = float(height)
+    weight = float(weight)
+
+    user_bmi = calculate_bmi(weight, height)
+    user_bmr = calculate_bmr(weight, height, age, gender)
+    user_tdee = calculate_tdee(user_bmr, activity)
+
+else:
+    if not height or not weight:
+    st.info("👤 키와 몸무게를 입력하면 맞춤 분석이 시작됩니다.")
+else:
+    ...
 if goal == "감량":
     daily_calorie = user_tdee - 300
 elif goal == "근육증가":
