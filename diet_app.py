@@ -384,3 +384,73 @@ with tab3:
             if os.path.exists(GROW_FILE):
                 os.remove(GROW_FILE)
             st.warning("수룡이 성장 기록이 초기화되었습니다. 페이지를 새로고침 해주세요.")
+
+st.divider()
+
+st.subheader("🗓️ 월별 운동 캘린더")
+
+if os.path.exists(LOG_FILE):
+
+    df_log = pd.read_csv(LOG_FILE)
+
+    # 날짜 컬럼 datetime 변환
+
+    df_log["날짜"] = pd.to_datetime(df_log["날짜"])
+
+    # 년/월 선택
+
+    col_y, col_m = st.columns(2)
+
+    with col_y:
+
+        selected_year = st.selectbox("연도 선택", sorted(df_log["날짜"].dt.year.unique()))
+
+    with col_m:
+
+        selected_month = st.selectbox("월 선택", list(range(1, 13)))
+
+    # 해당 월 데이터 필터링
+
+    month_data = df_log[
+
+        (df_log["날짜"].dt.year == selected_year) &
+
+        (df_log["날짜"].dt.month == selected_month)
+
+    ]
+
+    # 운동한 날짜 추출 (중복 제거)
+
+    exercise_days = month_data["날짜"].dt.day.unique()
+
+    # 캘린더 생성
+
+    cal = calendar.monthcalendar(selected_year, selected_month)
+
+    st.write(f"📅 {selected_year}년 {selected_month}월 운동 기록")
+
+    # 캘린더 출력
+
+    for week in cal:
+
+        cols = st.columns(7)
+
+        for i, day in enumerate(week):
+
+            if day == 0:
+
+                cols[i].write("")
+
+            else:
+
+                if day in exercise_days:
+
+                    cols[i].markdown(f"🟢 **{day}**")  # 운동한 날
+
+                else:
+
+                    cols[i].markdown(f"{day}")
+
+else:
+
+    st.info("기록이 있어야 캘린더가 표시됩니다!")
